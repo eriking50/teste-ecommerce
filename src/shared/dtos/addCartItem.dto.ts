@@ -1,0 +1,58 @@
+import { CartItemPeriodicity, CartItemTypeEnum } from '../enums/CartItem.enum'
+import { ValidationError } from '../errors/Validation.error'
+import { BaseDTOValidator } from '../interfaces/base.dto'
+
+export class AddCartItemDTO implements BaseDTOValidator {
+	public productId: string
+	public type: CartItemTypeEnum
+	public quantity: number
+	public price: number
+	public periodicity: CartItemPeriodicity
+
+	constructor(
+		body: Record<string, any>
+	) {
+		this.productId = body?.productId;
+		this.type = body?.type;
+		this.quantity = body?.quantity;
+		this.price = body?.price;
+		this.periodicity = body?.periodicity;
+	}
+
+	validate() {
+		if (!this.productId) {
+			throw new ValidationError(
+				'productId is Required on adding a cart item'
+			)
+		}
+
+		const typeList = Object.values(CartItemTypeEnum)
+
+		if (!this.type || !typeList.includes(this.type)) {
+			throw new ValidationError(
+					'type is Required on adding a cart item and must be "single" or "subscription"'
+			)
+		}
+
+		if (!this.quantity || isNaN(Number(this.quantity)) || Number(this.quantity) < 0) {
+			throw new ValidationError(
+					'quantity is Required on adding a cart item and must be a positive number'
+			)
+		}
+
+		if (!this.price || isNaN(Number(this.price)) || Number(this.price) < 0) {
+			throw new ValidationError(
+					'price is Required on adding a cart item and must be a positive number'
+			)
+		}
+
+		const periodicityList = Object.values(CartItemPeriodicity)
+
+		if ((this.type === CartItemTypeEnum.SUBSCRIPTION && !this.periodicity) || (this.type === CartItemTypeEnum.SUBSCRIPTION && !periodicityList.includes(this.periodicity))) {
+			throw new ValidationError(
+					'periodicity is Required on adding a cart item with type "subscription" and must be "monthly", "quarterly" or "yearly"'
+			)
+		}
+	}
+}
+
