@@ -4,7 +4,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
-import { CartItemTypeEnum, CartItemPeriodicity } from '../../shared/enums/CartItem.enum';
+import { CartItemType, CartItemPeriodicity } from '../../shared/enums/CartItem.enum';
 import { BaseEntity } from './BaseEntity';
 import { CartEntity } from './Cart.entity';
 import { ProductEntity } from './Product.entity';
@@ -17,8 +17,8 @@ export class CartItemEntity extends BaseEntity {
   @Column()
   productId: string
 
-  @Column({type: 'enum', enum: CartItemTypeEnum})
-  type: CartItemTypeEnum
+  @Column({type: 'enum', enum: CartItemType})
+  type: CartItemType
   
   @Column()
   quantity: number;

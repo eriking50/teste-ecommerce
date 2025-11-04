@@ -1,4 +1,5 @@
 import CartRepositoryInstance, {CartRepository} from "src/infrastructure/repository/cart.repository"
+import { CheckoutCartDTO } from "src/shared/dtos/checkoutCart.dto";
 import { OpenCartDTO } from "src/shared/dtos/openCart.dto"
 
 export class CartService {
@@ -15,8 +16,8 @@ export class CartService {
 		return {id: newCart.id, status: newCart.status}
 	}
 
-	async checkoutCart() {
-		return ''
+	async checkoutCart(cartId: string,  data: CheckoutCartDTO) {
+		return await this.cartRepository.checkout(cartId, data);
 	}
 }
 

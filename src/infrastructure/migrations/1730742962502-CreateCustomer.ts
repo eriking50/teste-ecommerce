@@ -6,7 +6,7 @@ export class CreateCustomer1730742962502 implements MigrationInterface {
       CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     `);
     await queryRunner.query(`
-      CREATE TABLE "customer" (
+      CREATE TABLE "customers" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
@@ -18,6 +18,6 @@ export class CreateCustomer1730742962502 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE "customer"`);
+    await queryRunner.query(`DROP TABLE "customers"`);
   }
 }

@@ -1,10 +1,10 @@
-export enum CartItemTypeEnum {
+export enum CartItemType {
   SINGLE = 'single',
   SUBSCRIPTION = 'subscription',
 }
 
 export enum CartItemPeriodicity {
   MONTHLY = "monthly",
-  QUATERLY = "quarterly",
+  QUARTERLY = "quarterly",
   YEARLY = "yearly",
 }

@@ -16,7 +16,7 @@ export class CreateCarts1730742963377 implements MigrationInterface {
         "status" "carts_status_enum" NOT NULL,
         "customerId" uuid NOT NULL,
         CONSTRAINT "PK_carts_id" PRIMARY KEY ("id"),
-        CONSTRAINT "FK_carts_customer" FOREIGN KEY ("customerId") REFERENCES "customer"("id")
+        CONSTRAINT "FK_carts_customers" FOREIGN KEY ("customerId") REFERENCES "customers"("id")
       )
     `);
   }

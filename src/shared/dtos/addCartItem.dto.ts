@@ -1,10 +1,10 @@
-import { CartItemPeriodicity, CartItemTypeEnum } from '../enums/CartItem.enum'
+import { CartItemPeriodicity, CartItemType } from '../enums/CartItem.enum'
 import { ValidationError } from '../errors/Validation.error'
 import { BaseDTOValidator } from '../interfaces/base.dto'
 
 export class AddCartItemDTO implements BaseDTOValidator {
 	public productId: string
-	public type: CartItemTypeEnum
+	public type: CartItemType
 	public quantity: number
 	public price: number
 	public periodicity: CartItemPeriodicity
@@ -26,7 +26,7 @@ export class AddCartItemDTO implements BaseDTOValidator {
 			)
 		}
 
-		const typeList = Object.values(CartItemTypeEnum)
+		const typeList = Object.values(CartItemType)
 
 		if (!this.type || !typeList.includes(this.type)) {
 			throw new ValidationError(
@@ -48,10 +48,18 @@ export class AddCartItemDTO implements BaseDTOValidator {
 
 		const periodicityList = Object.values(CartItemPeriodicity)
 
-		if ((this.type === CartItemTypeEnum.SUBSCRIPTION && !this.periodicity) || (this.type === CartItemTypeEnum.SUBSCRIPTION && !periodicityList.includes(this.periodicity))) {
-			throw new ValidationError(
-					'periodicity is Required on adding a cart item with type "subscription" and must be "monthly", "quarterly" or "yearly"'
-			)
+		if (this.type === CartItemType.SUBSCRIPTION) {
+			if (!this.periodicity || !periodicityList.includes(this.periodicity)) {
+				throw new ValidationError(
+						'periodicity is Required on adding a cart item with type "subscription" and must be "monthly", "quarterly" or "yearly"'
+				)
+			}
+
+			if (this.quantity > 1) {
+				throw new ValidationError(
+						'quantity cannot be greater than 1 on adding a cart item with type "subscription"'
+				)
+			}
 		}
 	}
 }
