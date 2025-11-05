@@ -4,9 +4,7 @@ import CartServiceInstance, { CartService } from './cart.service'
 import { CheckoutCartDTO } from 'src/shared/dtos/checkoutCart.dto'
 
 class CartController {
-	constructor(private readonly cartService: CartService) {
-		this
-	}
+	constructor(private readonly cartService: CartService) {}
 
 	openCart = async (req: express.Request<any, any, OpenCartDTO>, res: express.Response) => {
 		const response = await this.cartService.openCart(req.body)

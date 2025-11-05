@@ -3,9 +3,7 @@ import CartServiceInstance, { CustomerService } from './customer.service'
 import { CreateCustomerDTO } from 'src/shared/dtos/createCustomer.dto'
 
 class CartController {
-	constructor(private readonly customerService: CustomerService) {
-		this
-	}
+	constructor(private readonly customerService: CustomerService) {}
 
 	createCustomer = async (req: express.Request<any, any, CreateCustomerDTO>, res: express.Response) => {
 		const response = await this.customerService.createCustomer(req.body)

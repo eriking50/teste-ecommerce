@@ -1,4 +1,4 @@
-import { DataSource, EntityManager, In, Transaction } from "typeorm";
+import { DataSource, EntityManager, In } from "typeorm";
 import TypeormDataSource from "./DataSource";
 import { CartEntity } from "../entities/Cart.entity";
 import { CustomerEntity } from "../entities/Customer.entity";
@@ -66,21 +66,7 @@ export class CartRepository {
       const transaction = await manager.save(TransactionEntity,
         { totalValue, order, paymentType: data.paymentType, status})
 
-      if (status === TransactionStatus.SUCCESS) {
-        await this.simulateSuccess(cart, order, transaction, manager)
-      }
-
-      return {
-        status,
-        paymentType: data.paymentType,
-        orderId: order.id,
-        transactionId: transaction.id,
-      }
-    })
-  }
-
-  async simulateSuccess(cart: CartEntity, order: OrderEntity, transaction: TransactionEntity, manager: EntityManager) {
-    const subscriptions = await Promise.all(cart.items
+      const subscriptions = await Promise.all(cart.items
       .filter(item => item.type === CartItemType.SUBSCRIPTION)
       .map((item) => {
         const now = new Date()
@@ -97,6 +83,21 @@ export class CartRepository {
         })
       }))
 
+      if (status === TransactionStatus.SUCCESS) {
+        await this.simulateSuccess(cart, subscriptions, transaction, manager)
+      }
+
+      return {
+        status,
+        paymentType: data.paymentType,
+        orderId: order.id,
+        transactionId: transaction.id,
+        subscriptionIds: subscriptions.map(subscription => subscription.id),
+      }
+    })
+  }
+
+  async simulateSuccess(cart: CartEntity, subscriptions: SubscriptionEntity[], transaction: TransactionEntity, manager: EntityManager) {
     await Promise.all(subscriptions.map((subscription) => {
       const now = new Date()
 
