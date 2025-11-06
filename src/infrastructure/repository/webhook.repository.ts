@@ -30,15 +30,19 @@ export class WebhookRepository {
     console.log('Transaction found');
 
     if (data.event === WebhookEventTypeEnum.PENDING) {
+      console.log('Processing pending type event');
       return this.saveEvent(data, hash)
     }
 
     if (data.event === WebhookEventTypeEnum.FAILED ) {
+      console.log('Processing failed type event');
       return await this.database.transaction(async (manager) => {
           if (data.metadata.cartId) {
+            console.log('Reopening Cart');
             await manager.update(CartEntity, data.metadata.cartId, { status: CartStatus.OPEN, updatedAt: new Date() })
           }
 
+          console.log('Updating subscription status');
           for (const subscription of data.metadata.subscriptionIds) {
             await manager.update(SubscriptionEntity, subscription, {status: SubscriptionStatus.PAST_DUE})
           }
@@ -47,6 +51,7 @@ export class WebhookRepository {
         })
     }
 
+    console.log('Processing success type event');
     await this.database.transaction(async (manager) => {
       for (const subscriptionId of data.metadata.subscriptionIds) {
         const subscription = await manager.findOne(SubscriptionEntity, {where: {id: subscriptionId}})
@@ -59,12 +64,12 @@ export class WebhookRepository {
 
         const endDate = getEndDate(now, subscription.periodicity);
 
+        console.log('Updating subscription status');
         await manager.update(SubscriptionEntity, subscription.id, {status: SubscriptionStatus.ACTIVE})
 
+        console.log('Creating a new period');
         await manager.save(PeriodEntity, {transactionId: transaction.id, startDate: now, endDate, subscriptionId: subscription.id})
       }
-
-      await manager.update(CartEntity, data.metadata.cartId, { status: CartStatus.CLOSED, updatedAt: new Date() })
 
       await manager.save(ProcessedEventEntity, {hash, eventType: data.event, transactionId: data.transactionId})
     })
@@ -72,7 +77,7 @@ export class WebhookRepository {
 
   private async getTransaction(data: UpdateTransactionStatusDTO, hash: string) {
     const transaction = await this.database.getRepository(TransactionEntity).findOne({
-      where: {id: data.customerId},
+      where: {id: data.transactionId},
       relations: {
         order: true
       }
