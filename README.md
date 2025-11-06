@@ -59,6 +59,19 @@ Adiciona um item ao carrinho de compras
 [DELETE] /cart/:cartId/cart-item/:itemId
 Remove um item do carrinho de compras
 
+### Produtos:
+
+Produtos cadatrados via migration:
+
+```text
+id                                    Valor Nome
+75d4879b-5321-43c4-8e6c-699497801ddd	10	  Assinatura Bronze
+7b17db55-5381-4099-92c4-2cd36d99da7b	25	  Assinatura Prata
+7b65e9f1-5257-4352-bcdf-60722c0313cc	50	  Assinatura Ouro
+ce215b7c-eb16-4c82-9335-e2a545511017	100	  Assinatura Diamante
+
+```
+
 
 ### Scripts:
 
