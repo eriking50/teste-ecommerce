@@ -8,6 +8,7 @@ const ENVS_TO_VALIDATE = [
   'DB_PORT',
   'TEST_TOKEN',
   'WEBHOOK_AUTHORIZATION_TOKEN',
+  'MAX_SUBSCRIPTION_ENDING_DAYS'
 ]
 
 export const validateEnvs = () => {

@@ -4,10 +4,10 @@ import BillingEngineServiceInstance, { BillingEngineService } from './billingEng
 class BillingEngineController {
 	constructor(private readonly billingEngineService: BillingEngineService) {}
 
-	forceEngine = async (req: express.Request, res: express.Response) => {
-		const response = await this.billingEngineService.forceEngine(req.params.subscriptionId)
+	execute = async (req: express.Request, res: express.Response) => {
+		await this.billingEngineService.execute()
 
-		res.status(200).json(response);
+		res.status(204).send();
 	}
 }
 

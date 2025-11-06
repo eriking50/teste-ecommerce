@@ -130,6 +130,6 @@ Para simular o webhook chame o endpoint abaixo com os dados necessários.
 
 ### Motor de Cobrança
 
-Para gerar um novo período de uma assinatura chame o endpint passando uma assinatura existente.
+Para gerar um novo período de uma assinatura chame o endpint para execução
 
-[POST] /billing-engine/:subscriptionId
+[POST] /billing-engine
