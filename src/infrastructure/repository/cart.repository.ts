@@ -39,8 +39,12 @@ export class CartRepository {
   async checkout(cartId: string, data: CheckoutCartDTO) {
     const cart = await this.database.getRepository(CartEntity).findOne({where: {id: cartId, status: CartStatus.OPEN}, relations: {items: true}})
 
-    if (!cart || !cart.items.length) {
+    if (!cart) {
       throw new HttpError(422, 'Cart not found')
+    }
+
+    if (!cart.items.length) {
+      throw new HttpError(422, 'Cart is empty')
     }
 
     const alreadySubscribed = await this.database.getRepository(SubscriptionEntity).find({where: {
