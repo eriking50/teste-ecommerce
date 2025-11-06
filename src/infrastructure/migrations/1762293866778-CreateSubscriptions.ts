@@ -11,7 +11,7 @@ export class CreateSubscriptions1762293866778 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
-      CREATE TYPE "subscription_status_enum" AS ENUM('ACTIVE', 'INACTIVE', 'CANCELLED');
+      CREATE TYPE "subscription_status_enum" AS ENUM('ACTIVE', 'PAST_DUE', 'CANCELED');
     `);
 
     await queryRunner.query(`

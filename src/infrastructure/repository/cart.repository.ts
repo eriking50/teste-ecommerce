@@ -39,7 +39,7 @@ export class CartRepository {
   async checkout(cartId: string, data: CheckoutCartDTO) {
     const cart = await this.database.getRepository(CartEntity).findOne({where: {id: cartId, status: CartStatus.OPEN}, relations: {items: true}})
 
-    if (!cart) {
+    if (!cart || !cart.items.length) {
       throw new HttpError(422, 'Cart not found')
     }
 
