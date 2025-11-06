@@ -4,23 +4,25 @@
   "description": "Teste técnico para Backend",
   "main": "src/main.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:run": "typeorm migration:run -d src/infrastructure/repository/DataSource.ts",
-"start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node -r tsconfig-paths/register' src/main.ts"
+    "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node -r tsconfig-paths/register' src/main.ts"
   },
   "author": "Erik Bergkamp",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
     "morgan": "^1.10.1",
     "pg": "^8.16.3",
-    "typeorm": "^0.3.27"
+    "typeorm": "^0.3.27",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
     "@types/morgan": "^1.9.10",
+    "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",

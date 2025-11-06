@@ -65,6 +65,8 @@ export class CartRepository {
 
       const transaction = await manager.save(TransactionEntity,
         { totalValue, order, paymentType: data.paymentType, status})
+      
+      await manager.update(CartEntity, cart.id, { status: CartStatus.CLOSED, updatedAt: new Date() })
 
       const subscriptions = await Promise.all(cart.items
       .filter(item => item.type === CartItemType.SUBSCRIPTION)
@@ -78,7 +80,7 @@ export class CartRepository {
           productId: item.productId,
           customerId: cart.customerId,
           periodicity: item.periodicity,
-          status: SubscriptionStatus.ACTIVE,
+          status: SubscriptionStatus.PAST_DUE,
           nextBillingDate,
         })
       }))
@@ -98,15 +100,13 @@ export class CartRepository {
   }
 
   async simulateSuccess(cart: CartEntity, subscriptions: SubscriptionEntity[], transaction: TransactionEntity, manager: EntityManager) {
-    await Promise.all(subscriptions.map((subscription) => {
+    for (const subscription of subscriptions) {
       const now = new Date()
-
       const endDate = getEndDate(now, subscription.periodicity);
 
-      return manager.save(PeriodEntity, 
-        {transactionId: transaction.id, startDate: now, endDate, subscriptionId: subscription.id}
-      )
-    }))
+      await manager.save(PeriodEntity, {transactionId: transaction.id, startDate: now, endDate, subscriptionId: subscription.id})
+      await manager.update(SubscriptionEntity, subscription.id, {status: SubscriptionStatus.ACTIVE})
+    }
 
     await manager.update(CartEntity, cart.id, { status: CartStatus.CLOSED, updatedAt: new Date() })
   }

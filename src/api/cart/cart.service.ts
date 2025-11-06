@@ -1,6 +1,8 @@
 import CartRepositoryInstance, {CartRepository} from "src/infrastructure/repository/cart.repository"
 import { CheckoutCartDTO } from "src/shared/dtos/checkoutCart.dto";
 import { OpenCartDTO } from "src/shared/dtos/openCart.dto"
+import { ValidationError } from "src/shared/errors/Validation.error";
+import { validate as validateUUID } from "uuid";
 
 export class CartService {
 	constructor(private readonly cartRepository: CartRepository) {}
@@ -17,6 +19,11 @@ export class CartService {
 	}
 
 	async checkoutCart(cartId: string,  data: CheckoutCartDTO) {
+
+		if (!validateUUID(cartId)) {
+			throw new ValidationError("cartId is not a UUID")
+		}
+
 		return await this.cartRepository.checkout(cartId, data);
 	}
 }

@@ -17,13 +17,13 @@ export class CreateCustomerDTO implements BaseDTOValidator {
   validate() {
     if (!this.name) {
       throw new ValidationError(
-          'name is Required on customer creation'
+        'name is Required on customer creation'
       )
     }
 
     if (!this.email || !this.email.match(EMAIL_REGEX)) {
       throw new ValidationError(
-          'email is Required and be valid on customer creation'
+        'email is Required and be valid on customer creation'
       )
     }
   }

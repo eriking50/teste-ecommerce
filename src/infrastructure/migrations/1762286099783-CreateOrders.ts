@@ -12,7 +12,7 @@ export class CreateOrders1762286099783 implements MigrationInterface {
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
         "customerId" uuid NOT NULL,
-        "cartId" uuid NOT NULL,
+        "cartId" uuid,
         CONSTRAINT "PK_orders_id" PRIMARY KEY ("id"),
         CONSTRAINT "FK_orders_customers" FOREIGN KEY ("customerId") REFERENCES "customers"("id"),
         CONSTRAINT "FK_orders_carts" FOREIGN KEY ("cartId") REFERENCES "carts"("id")

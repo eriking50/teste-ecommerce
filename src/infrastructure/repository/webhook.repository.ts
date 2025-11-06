@@ -11,6 +11,8 @@ import { CartStatus } from "src/shared/enums/Cart.enum";
 import { CartEntity } from "../entities/Cart.entity";
 import { PeriodEntity } from "../entities/Period.entity";
 import { getEndDate } from "src/shared/utils/date.util";
+import { SubscriptionEntity } from "../entities/Subscription.entity";
+import { SubscriptionStatus } from "src/shared/enums/Subscription.enum";
 
 export class WebhookRepository {
 
@@ -23,24 +25,44 @@ export class WebhookRepository {
 
     await this.validateEvent(hash);
 
-    const transaction = await this.getTransaction(data);
+    const transaction = await this.getTransaction(data, hash);
 
     console.log('Transaction found');
 
-    if (data.event !== WebhookEventTypeEnum.SUCCESS) {
-      return;
+    if (data.event === WebhookEventTypeEnum.PENDING) {
+      return this.saveEvent(data, hash)
+    }
+
+    if (data.event === WebhookEventTypeEnum.FAILED ) {
+      return await this.database.transaction(async (manager) => {
+          if (data.metadata.cartId) {
+            await manager.update(CartEntity, data.metadata.cartId, { status: CartStatus.OPEN, updatedAt: new Date() })
+          }
+
+          for (const subscription of data.metadata.subscriptionIds) {
+            await manager.update(SubscriptionEntity, subscription, {status: SubscriptionStatus.PAST_DUE})
+          }
+
+          await manager.save(ProcessedEventEntity, {hash, eventType: data.event, transactionId: data.transactionId})
+        })
     }
 
     await this.database.transaction(async (manager) => {
+      for (const subscriptionId of data.metadata.subscriptionIds) {
+        const subscription = await manager.findOne(SubscriptionEntity, {where: {id: subscriptionId}})
 
-    await Promise.all(transaction.order.subscriptions.map((subscription) => {
-      const now = new Date()
+        if (!subscription) {
+          throw new HttpError(422, `Subscription with ID ${subscriptionId} not found`)
+        }
 
-      const endDate = getEndDate(now, subscription.periodicity);
+        const now = new Date()
 
-      return manager.save(PeriodEntity, 
-        {transactionId: transaction.id, startDate: now, endDate, subscriptionId: subscription.id})
-      }))
+        const endDate = getEndDate(now, subscription.periodicity);
+
+        await manager.update(SubscriptionEntity, subscription.id, {status: SubscriptionStatus.ACTIVE})
+
+        await manager.save(PeriodEntity, {transactionId: transaction.id, startDate: now, endDate, subscriptionId: subscription.id})
+      }
 
       await manager.update(CartEntity, data.metadata.cartId, { status: CartStatus.CLOSED, updatedAt: new Date() })
 
@@ -48,23 +70,29 @@ export class WebhookRepository {
     })
   }
 
-  private async getTransaction(data: UpdateTransactionStatusDTO) {
+  private async getTransaction(data: UpdateTransactionStatusDTO, hash: string) {
     const transaction = await this.database.getRepository(TransactionEntity).findOne({
       where: {id: data.customerId},
       relations: {
-        order: {subscriptions: true}
+        order: true
       }
     })
 
     if (!transaction) {
+      await this.saveEvent(data, hash);
       throw new HttpError(422, 'Transaction not found')
     }
 
     if (transaction.status !== TransactionStatus.PENDING) {
+      await this.saveEvent(data, hash);
       throw new HttpError(422, 'Transaction not in pending status')
     }
 
     return transaction;
+  }
+
+  private async saveEvent(data: UpdateTransactionStatusDTO, hash: string) {
+    await this.database.getRepository(ProcessedEventEntity).save({hash, eventType: data.event, transactionId: data.transactionId})
   }
 
   private async validateEvent(hash: string) {

@@ -3,12 +3,16 @@ import { registerCartRoutes } from "./cart/cart.routes";
 import { registerCartItemRoutes } from "./cartItem/cartItem.routes";
 import { registerCustomerRoutes } from "./customer/customer.routes";
 import { registerWebhookRoutes } from "./webhook/webhook.routes";
+import { registerAuthenticationRoutes } from "./authentication/authentication.routes";
+import { registerBillingEngineRoutes } from "./billingEngine/billingEngine.routes";
 
 const routes: Router = express.Router();
 
+registerAuthenticationRoutes(routes);
 registerCartRoutes(routes);
 registerCartItemRoutes(routes);
 registerCustomerRoutes(routes);
 registerWebhookRoutes(routes);
+registerBillingEngineRoutes(routes);
 
 export default routes;

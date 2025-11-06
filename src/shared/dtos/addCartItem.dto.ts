@@ -1,6 +1,7 @@
 import { CartItemPeriodicity, CartItemType } from '../enums/CartItem.enum'
 import { ValidationError } from '../errors/Validation.error'
 import { BaseDTOValidator } from '../interfaces/base.dto'
+import { validate as validateUUID } from "uuid";
 
 export class AddCartItemDTO implements BaseDTOValidator {
 	public productId: string
@@ -20,9 +21,9 @@ export class AddCartItemDTO implements BaseDTOValidator {
 	}
 
 	validate() {
-		if (!this.productId) {
+		if (!this.productId || !validateUUID(this.productId)) {
 			throw new ValidationError(
-				'productId is Required on adding a cart item'
+				'productId is Required and must be an UUID on adding a cart item'
 			)
 		}
 

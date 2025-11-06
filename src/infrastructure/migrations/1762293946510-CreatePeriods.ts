@@ -16,8 +16,8 @@ export class CreatePeriods1762293946510 implements MigrationInterface {
         "startDate" TIMESTAMP NOT NULL,
         "endDate" TIMESTAMP NOT NULL,
         CONSTRAINT "PK_periods_id" PRIMARY KEY ("id"),
-        CONSTRAINT "FK_periods_transactions" FOREIGN KEY ("transactionId") REFERENCES "transactions"("id") ON DELETE CASCADE,
-        CONSTRAINT "FK_periods_subscriptions" FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE CASCADE
+        CONSTRAINT "FK_periods_transactions" FOREIGN KEY ("transactionId") REFERENCES "transactions"("id"),
+        CONSTRAINT "FK_periods_subscriptions" FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id")
       );
     `);
   }

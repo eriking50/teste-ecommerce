@@ -2,6 +2,7 @@ import { TransactionPaymentType } from '../enums/Transaction.enum';
 import { WebhookEventTypeEnum } from '../enums/Webhook.enum';
 import { ValidationError } from '../errors/Validation.error';
 import { BaseDTOValidator } from '../interfaces/base.dto'
+import { validate as validateUUID } from "uuid";
 
 export class UpdateTransactionStatusDTO implements BaseDTOValidator {
   public event: WebhookEventTypeEnum;
@@ -13,8 +14,8 @@ export class UpdateTransactionStatusDTO implements BaseDTOValidator {
   public paymentMethod: TransactionPaymentType;
   public timestamp: string;
   public metadata: {
-    cartId: string;
-    subscriptionId: string;
+    cartId?: string;
+    subscriptionIds: string[];
   }
 
   constructor(
@@ -22,6 +23,13 @@ export class UpdateTransactionStatusDTO implements BaseDTOValidator {
   ) {
     this.event = body?.event;
     this.transactionId = body?.transactionId;
+    this.orderId = body?.orderId;
+    this.customerId = body?.customerId;
+    this.amount = body?.amount;
+    this.currency = body?.currency;
+    this.paymentMethod = body?.paymentMethod;
+    this.timestamp = body?.timestamp;
+    this.metadata = body?.metadata;
   }
 
   validate() {
@@ -31,21 +39,21 @@ export class UpdateTransactionStatusDTO implements BaseDTOValidator {
       )
     }
 
-    if (!this.transactionId) {
+    if (!this.transactionId|| !validateUUID(this.transactionId)) {
       throw new ValidationError(
-        'transactionId is Required on transaction update status'
+        'transactionId is Required and must be an UUID on transaction update status'
       )
     }
 
-    if (!this.customerId) {
+    if (!this.customerId|| !validateUUID(this.customerId)) {
       throw new ValidationError(
-        'customerId is Required on transaction update status'
+        'customerId is Required and must be an UUID on transaction update status'
       )
     }
 
-    if (!this.orderId) {
+    if (!this.orderId|| !validateUUID(this.orderId)) {
       throw new ValidationError(
-        'orderId is Required on transaction update status'
+        'orderId is Required and must be an UUID on transaction update status'
       )
     }
 
@@ -55,15 +63,18 @@ export class UpdateTransactionStatusDTO implements BaseDTOValidator {
       )
     }
 
-    if (!this.metadata?.cartId) {
+    if (!this.metadata?.subscriptionIds
+        || !Array.isArray(this.metadata.subscriptionIds)
+        || this.metadata.subscriptionIds.some(id => !validateUUID(id)))
+      {
       throw new ValidationError(
-        'cartId is Required on transaction update status'
+        'subscriptionIds is Required and must be an array of UUIDs on transaction update status'
       )
     }
 
-    if (!this.metadata?.subscriptionId) {
+    if (this.metadata?.cartId && !validateUUID(this.metadata.cartId)) {
       throw new ValidationError(
-        'subscriptionId is Required on transaction update status'
+        'cartId must be an UUID on transaction update status'
       )
     }
   }
